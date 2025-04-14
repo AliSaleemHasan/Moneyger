@@ -1,0 +1,42 @@
+version: "3.8"
+services:
+  # moneyger:
+  #   container_name: moneyger
+  #   build:
+  #     context: ./
+  #     target: dev
+  #     dockerfile: Dockerfile
+  #   environment:
+  #       - CHOKIDAR_USEPOLLING=true # Force file watching
+  #       - WATCHPACK_POLLING=true   # For Webpack-based apps
+  #   volumes:
+  #       - .:/app
+  #       - /app/node_modules
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - db
+
+  db:
+    image: postgres:latest
+    container_name: moneyger_db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=moneyger
+      - POSTGRES_PASSWORD=moneyger
+      - POSTGRES_DB=moneyger
+    ports:
+      - "5432:5432"
+    volumes:
+      - ../data/db:/var/lib/postgresql/data
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: nameger_pgadmin
+    depends_on:
+      - db
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=test@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=test
