@@ -120,21 +120,31 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  email: 'email',
-  image: 'image',
-  role: 'role'
+  name: 'name',
+  password: 'password',
+  email: 'email'
 };
 
-exports.Prisma.LinkScalarFieldEnum = {
+exports.Prisma.AccountScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  userId: 'userId'
+};
+
+exports.Prisma.CategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  userId: 'userId',
+  Description: 'Description'
+};
+
+exports.Prisma.RecordScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  title: 'title',
-  description: 'description',
-  url: 'url',
-  imageUrl: 'imageUrl',
-  category: 'category'
+  amount: 'amount',
+  type: 'type',
+  accountId: 'accountId',
+  categoryId: 'categoryId'
 };
 
 exports.Prisma.SortOrder = {
@@ -146,19 +156,16 @@ exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
 };
-
-exports.Prisma.NullsOrder = {
-  first: 'first',
-  last: 'last'
-};
-exports.Role = exports.$Enums.Role = {
-  USER: 'USER',
-  ADMIN: 'ADMIN'
+exports.Type = exports.$Enums.Type = {
+  ICOOME: 'ICOOME',
+  EXPENCE: 'EXPENCE'
 };
 
 exports.Prisma.ModelName = {
   User: 'User',
-  Link: 'Link'
+  Account: 'Account',
+  Category: 'Category',
+  Record: 'Record'
 };
 
 /**
