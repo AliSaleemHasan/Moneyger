@@ -9,10 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@prisma/client": "^6.6.0",
+    "@pothos/core": "^4.6.0",
+    "@pothos/plugin-prisma": "^4.5.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^16.5.0",
+    "graphql": "^16.10.0",
+    "graphql-yoga": "^5.13.4",
     "lucide-react": "^0.488.0",
     "next": "15.3.0",
     "pg": "^8.14.1",
@@ -24,8 +27,9 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@prisma/client": "^6.6.0",
     "@tailwindcss/postcss": "^4",
-    "@types/node": "20.17.30",
+    "@types/node": "^20.17.30",
     "@types/react": "19.1.2",
     "@types/react-dom": "^19",
     "eslint": "^9",
@@ -36,6 +40,6 @@
     "typescript": "5.8.3"
   },
   "prisma": {
-    "seed": "tsx ./prisma/seed.ts"
+    "seed": "tsx src/prisma/seed.ts"
   }
 }
