@@ -1,5 +1,7 @@
-import { gql } from "@apollo/client";
-
 export default async function Home() {
-  return <div>This is test </div>;
+  return (
+    <div>
+      <h2>Your transactions</h2>
+    </div>
+  );
 }
