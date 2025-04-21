@@ -1,8 +1,8 @@
-import AddCategory from "@/components/add-category-form";
-import CategoriesTable from "@/components/categories-table";
+import AddCategory from "@/components/settings/add-category-form";
+import CategoriesTable from "@/components/settings/categories-table";
 import { Separator } from "@/components/ui/separator";
 
-export default function SettingsProfilePage() {
+export default function SettingsCategoryPage() {
   return (
     <div className="space-y-4 ">
       <div>
