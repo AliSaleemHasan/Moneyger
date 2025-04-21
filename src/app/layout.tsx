@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
+import { Toaster } from "sonner";
+import ApolloWrapper from "@/lib/apollo-client/apollo-wrapper";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -27,7 +28,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="w-[100svw] ">{children}</div>
+        <ApolloWrapper>
+          <div className="w-[100svw] ">{children}</div>
+          <Toaster />
+        </ApolloWrapper>
       </body>
     </html>
   );
