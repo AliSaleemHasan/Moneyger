@@ -1,29 +1,20 @@
 "use client";
 
-import * as React from "react";
-
+import { useActionState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-
+import { signup } from "@/app/actions/auth";
+import FormError from "../ui/form-error";
 interface UserSignUpFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function UserSignupForm({ className, ...props }: UserSignUpFormProps) {
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
-
-  async function onSubmit(event: React.SyntheticEvent) {
-    event.preventDefault();
-    setIsLoading(true);
-
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 3000);
-  }
+  const [state, action, pending] = useActionState(signup, undefined);
 
   return (
     <div className={cn("grid gap-6 mx-10", className)} {...props}>
-      <form onSubmit={onSubmit}>
+      <form action={action}>
         <div className="grid gap-2">
           <div className="grid gap-1">
             <Label className="sr-only" htmlFor="email">
@@ -31,43 +22,63 @@ export function UserSignupForm({ className, ...props }: UserSignUpFormProps) {
             </Label>
             <Input
               id="email"
+              name="email"
               placeholder="name@example.com"
               type="email"
               autoCapitalize="none"
               autoComplete="email"
               autoCorrect="off"
-              disabled={isLoading}
+              disabled={pending}
             />
           </div>
+          {state?.errors?.email && <FormError message={state.errors.email} />}
           <div className="grid gap-1">
             <Label className="sr-only" htmlFor="password">
               Password
             </Label>
             <Input
               id="password"
+              name="password"
               placeholder="Write Password.."
               type="password"
               autoCapitalize="none"
               autoComplete="password"
               autoCorrect="off"
-              disabled={isLoading}
+              disabled={pending}
             />
           </div>
+          {state?.errors?.password && (
+            <div className="text-xs text-red-500">
+              <p>Password must:</p>
+              <ul>
+                {state.errors.password.map((error) => (
+                  <li key={error}>- {error}</li>
+                ))}
+              </ul>
+            </div>
+          )}
           <div className="grid gap-1">
             <Label className="sr-only" htmlFor="confirm">
               Confirm Password
             </Label>
             <Input
               id="confirm"
+              name="confirm"
               placeholder="Confirm Passowrd.."
               type="password"
               autoCapitalize="none"
               autoComplete="confirm"
               autoCorrect="off"
-              disabled={isLoading}
+              disabled={pending}
             />
           </div>
-          <Button disabled={isLoading}>Create Account</Button>
+          {state?.errors?.confirm && (
+            <FormError message={state.errors.confirm} />
+          )}
+
+          <Button disabled={pending} type="submit">
+            Create Account
+          </Button>
         </div>
       </form>
       <div className="relative">

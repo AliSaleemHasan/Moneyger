@@ -1,9 +1,9 @@
-'use client'
-import { signup } from '@/actions/auth'
-import { useActionState } from 'react'
+"use client";
+import { signup } from "@/app/actions/auth";
+import { useActionState } from "react";
 
 export function SignupForm() {
-  const [state, action, pending] = useActionState(signup, undefined)
+  const [state, action, pending] = useActionState(signup, undefined);
   return (
     <form action={action}>
       <div>
@@ -32,5 +32,5 @@ export function SignupForm() {
       )}
       <button type="submit">Sign Up</button>
     </form>
-  )
+  );
 }

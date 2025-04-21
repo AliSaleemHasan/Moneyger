@@ -1,29 +1,20 @@
 "use client";
 
-import * as React from "react";
-
+import { useActionState } from "react";
 import { cn } from "@/lib/utils";
+import { signin } from "@/app/actions/auth";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import FormError from "../ui/form-error";
 
 interface UserLoginFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function UserLoginForm({ className, ...props }: UserLoginFormProps) {
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
-
-  async function onSubmit(event: React.SyntheticEvent) {
-    event.preventDefault();
-    setIsLoading(true);
-
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 3000);
-  }
-
+  const [state, action, pending] = useActionState(signin, undefined);
   return (
     <div className={cn("grid gap-6 mx-10", className)} {...props}>
-      <form onSubmit={onSubmit}>
+      <form action={action}>
         <div className="grid gap-2">
           <div className="grid gap-1">
             <Label className="sr-only" htmlFor="email">
@@ -33,10 +24,11 @@ export function UserLoginForm({ className, ...props }: UserLoginFormProps) {
               id="email"
               placeholder="name@example.com"
               type="email"
+              name="email"
               autoCapitalize="none"
               autoComplete="email"
               autoCorrect="off"
-              disabled={isLoading}
+              disabled={pending}
             />
           </div>
           <div className="grid gap-1">
@@ -45,16 +37,19 @@ export function UserLoginForm({ className, ...props }: UserLoginFormProps) {
             </Label>
             <Input
               id="password"
+              name="password"
               placeholder="Write Password.."
               type="password"
               autoCapitalize="none"
               autoComplete="password"
               autoCorrect="off"
-              disabled={isLoading}
+              disabled={pending}
             />
           </div>
 
-          <Button disabled={isLoading}>Login</Button>
+          <Button disabled={pending} type="submit">
+            Login
+          </Button>
         </div>
       </form>
       <div className="relative">

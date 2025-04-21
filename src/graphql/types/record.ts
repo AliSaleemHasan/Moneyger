@@ -20,11 +20,9 @@ builder.queryField("record", (t) =>
   t.prismaField({
     type: "Record",
     args: {
-      take: t.arg.int({ required: false }),
-      skip: t.arg.int({ required: false }),
       type: t.arg({ type: Type, required: false }),
     },
-    resolve: (query, _root, { take, skip, type }, ctx) => {
+    resolve: (query, _root, { type }, ctx) => {
       const where = type ? { type } : {};
       return prisma.record.findFirst({ ...query, where });
     },
@@ -32,45 +30,19 @@ builder.queryField("record", (t) =>
 );
 
 builder.queryField("records", (t) =>
-  t.prismaField({
-    type: ["Record"],
+  t.prismaConnection({
+    type: "Record",
+    cursor: "id",
     args: {
-      take: t.arg.int({ required: false }),
-      skip: t.arg.int({ required: false }),
       type: t.arg({ type: Type, required: false }),
     },
-    resolve: (query, _root, { take, skip, type }, ctx) => {
+    resolve: (query, _root, { type }, ctx) => {
       const where = type ? { type } : {};
       return prisma.record.findMany({ ...query, where });
     },
   })
 );
 
-// // Mutation to create a new Record.
-// builder.mutationField("createRecord", (t) =>
-//   t.prismaField({
-//     type: "Record",
-//     args: {
-//       amount: t.arg.float({ required: true }),
-//       type: t.arg({ type: Type, required: true }),
-//       accountId: t.arg.int({ required: true }),
-//       categoryId: t.arg.int({ required: true }),
-//     },
-//     resolve: async (query, _root, args, ctx) => {
-//       return prisma.record.create({
-//         data: {
-//           amount: args.amount,
-//           type: args.type,
-//           account: { connect: { id: args.accountId } },
-//           category: { connect: { id: args.categoryId } },
-//         },
-//         ...query,
-//       });
-//     },
-//   })
-// );
-
-// Mutation to update an existing Record.
 builder.mutationType({
   fields: (t) => ({
     createRecord: t.prismaField({
