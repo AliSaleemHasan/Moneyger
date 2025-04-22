@@ -1,11 +1,7 @@
 // app/actions/category.ts
-import { z } from "zod";
-
-// Zod schema for validating the category
-const CategorySchema = z.object({
-  name: z.string().nonempty("Name is required"),
-  description: z.string().optional(),
-});
+import { client } from "@/lib/apollo-client/apollo-client";
+import { CategorySchema } from "@/lib/definitions";
+import { gql } from "@apollo/client";
 
 // Simulate a database with an in-memory array
 let categories: any = [];
@@ -27,10 +23,29 @@ export async function addCategory(state: unknown, formData: FormData) {
     return { errors: result.error.flatten().fieldErrors };
   }
 
-  // Simulate database insertion. In production, you’d use your DB client.
-  const newCategory = { id: idCounter++, ...result.data };
-  categories.push(newCategory);
-  return { success: true, newCategory };
+  const CREATE_CATEGORY_MUTATION = gql`
+    mutation CreateCategory($name: String!, $description: String) {
+      createCategory(name: $name, description: $description) {
+        id
+        name
+        description
+      }
+    }
+  `;
+
+  try {
+    const { data } = await client.mutate({
+      mutation: CREATE_CATEGORY_MUTATION,
+      variables: {
+        name: "Test Category",
+        description: "This category is created server side",
+      },
+    });
+    return data;
+  } catch (error) {
+    console.error("Error creating category:", error);
+    throw error;
+  }
 }
 
 /**

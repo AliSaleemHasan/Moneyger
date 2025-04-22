@@ -1,4 +1,5 @@
 "use server";
+import { User } from "@/prisma/@/generated/prisma";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 // import { SessionPayload } from "@/app/lib/definitions";
@@ -6,10 +7,9 @@ import { cookies } from "next/headers";
 const secretKey = process.env.SESSION_SECRET;
 const encodedKey = new TextEncoder().encode(secretKey);
 
-export async function createSession(userId: string) {
+export async function createSession(user: Partial<User>) {
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-  const session = await encrypt({ userId, expiresAt });
-  console.log(session);
+  const session = await encrypt({ user, expiresAt });
   const cookieStore = await cookies();
 
   cookieStore.set("session", session, {
@@ -46,7 +46,10 @@ export async function deleteSession() {
   cookieStore.delete("session");
 }
 // TODO: add session payload types
-export async function encrypt(payload: { userId: string; expiresAt: Date }) {
+export async function encrypt(payload: {
+  user: Partial<User>;
+  expiresAt: Date;
+}) {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()

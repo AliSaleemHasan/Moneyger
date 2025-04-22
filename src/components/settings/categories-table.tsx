@@ -5,11 +5,19 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 import { deleteCategory } from "@/app/actions/category";
+import { gql, useQuery } from "@apollo/client";
 
+const query = gql`
+  query getCategories {
+    categories {
+      id
+      name
+      description
+    }
+  }
+`;
 export default function CategoriesTable() {
-  const [categories, setCategories] = useState([
-    { name: "test", description: "test", id: "1" },
-  ]);
+  const { loading, error, data } = useQuery(query);
 
   const [deleteState, deleteAction, deletePending] = useActionState(
     deleteCategory,
@@ -20,10 +28,9 @@ export default function CategoriesTable() {
     const formData = new FormData();
     formData.append("id", id.toString());
     const result: any = await deleteAction(formData);
-    if (result.success) {
-      setCategories((prev) => prev.filter((cat: any) => cat.id !== id));
-    }
   };
+
+  if (loading) return <p>loading..</p>;
 
   return (
     <div className="mx-auto  space-y-8 w-full">
@@ -40,7 +47,7 @@ export default function CategoriesTable() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {categories.map((cat: any) => (
+            {data.categories?.map((cat: any) => (
               <tr key={cat.id}>
                 <td className="px-6 py-4 whitespace-nowrap flex-1">
                   {cat.name}
@@ -63,7 +70,7 @@ export default function CategoriesTable() {
                 </td>
               </tr>
             ))}
-            {categories.length === 0 && (
+            {data.categories.length === 0 && (
               <tr>
                 <td
                   colSpan={2}

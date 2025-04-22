@@ -1,11 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -26,7 +21,7 @@ export default function AddTransaction() {
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          className="rounded-full p-3 font-bold cursor-pointer"
+          className="rounded-full p-3 font-bold cursor-pointer border-primary border-2 hover:shadow-2xl"
         >
           +
         </Button>

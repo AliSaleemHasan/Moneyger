@@ -42,3 +42,8 @@ export type AuthenticationFormState =
       message?: string;
     }
   | undefined;
+
+export const CategorySchema = z.object({
+  name: z.string().nonempty("Name is required"),
+  description: z.string().optional(),
+});

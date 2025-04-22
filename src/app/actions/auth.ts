@@ -5,7 +5,7 @@ import {
   SigninFormSchema,
 } from "@/lib/definitions";
 import prisma from "@/prisma/prisma";
-import { createSession, decrypt, deleteSession } from "@/app/session";
+import { createSession, deleteSession } from "@/app/session";
 import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
 
@@ -45,7 +45,8 @@ export async function signup(
     };
   }
 
-  await createSession(user.id.toString());
+  let { password: userPassword, createdAt, ...rest } = user;
+  await createSession(rest);
 
   redirect("/");
 
@@ -101,7 +102,9 @@ export async function signin(
     };
   }
 
-  await createSession(user.id.toString());
+  let { password: userPassword, createdAt, ...rest } = user;
+
+  await createSession(rest);
 
   redirect("/");
 
@@ -112,3 +115,5 @@ export async function logout() {
   deleteSession();
   redirect("/authentication/login");
 }
+
+export async function getUserSession() {}
