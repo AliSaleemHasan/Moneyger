@@ -7,6 +7,10 @@ import { cookies } from "next/headers";
 const secretKey = process.env.SESSION_SECRET;
 const encodedKey = new TextEncoder().encode(secretKey);
 
+type SessionPayload = {
+  user: Partial<User>;
+  expiresAt: Date;
+};
 export async function createSession(user: Partial<User>) {
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   const session = await encrypt({ user, expiresAt });
@@ -46,10 +50,7 @@ export async function deleteSession() {
   cookieStore.delete("session");
 }
 // TODO: add session payload types
-export async function encrypt(payload: {
-  user: Partial<User>;
-  expiresAt: Date;
-}) {
+export async function encrypt(payload: SessionPayload) {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
@@ -62,8 +63,16 @@ export async function decrypt(session: string | undefined = "") {
     const { payload } = await jwtVerify(session, encodedKey, {
       algorithms: ["HS256"],
     });
-    return payload;
+    return payload as SessionPayload;
   } catch (error) {
     console.log("Failed to verify session");
   }
+}
+
+export async function isAuthenticated() {
+  const session = (await cookies()).get("session")?.value;
+  const payload = await decrypt(session);
+  console.log(session, payload);
+  if (!payload) return { authenticated: false };
+  else return { user: payload.user, authenticated: true };
 }

@@ -5,7 +5,7 @@ import {
   SigninFormSchema,
 } from "@/lib/definitions";
 import prisma from "@/prisma/prisma";
-import { createSession, deleteSession } from "@/app/session";
+import { createSession, deleteSession, isAuthenticated } from "@/app/session";
 import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
 
@@ -116,4 +116,6 @@ export async function logout() {
   redirect("/authentication/login");
 }
 
-export async function getUserSession() {}
+export async function getUserSession() {
+  return isAuthenticated();
+}

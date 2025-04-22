@@ -1,14 +1,15 @@
 import { MainNav } from "@/components/dashboard/main-nav";
 import { UserNav } from "@/components/dashboard/user-nav";
-import { CalendarDateRangePicker } from "@/components/dashboard/date-range-picker";
-import { Button } from "@/components/ui/button";
-import AddTransaction from "@/components/transactions/add-transaction";
+import { getUserSession } from "../actions/auth";
+import { redirect } from "next/navigation";
 
-export default function AuthenticatedPagesLayout({
+export default async function AuthenticatedPagesLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { user, authenticated } = await getUserSession();
+  if (!authenticated) redirect("/login");
   return (
     <div className=" flex-col md:flex  container mx-auto h-screen   ">
       <div className="border-b px-4">

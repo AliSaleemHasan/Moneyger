@@ -1,17 +1,21 @@
 import { Metadata } from "next";
 import Image from "next/image";
 import MonegerBlack from "@/../public/MonegerDark.svg";
+import { getUserSession } from "../actions/auth";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Authentication",
   description: "Authentication forms built using the components.",
 };
 
-export default function AuthenticationLayout({
+export default async function AuthenticationLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { user, authenticated } = await getUserSession();
+  if (authenticated) redirect("/");
   return (
     <div className="container relative  max-w-none  h-screen  items-center justify-center grid  lg:grid-cols-2 lg:px-0 ">
       <div className="relative  w-screen lg:w-full    h-full p-5 lg:p-10 text-white dark:border   lg:flex justify-between flex-col">
