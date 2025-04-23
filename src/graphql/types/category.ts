@@ -66,6 +66,7 @@ builder.mutationType({
       type: "Category",
       args: {
         id: t.arg.int({ required: true }),
+
         name: t.arg.string({ required: true }),
         description: t.arg.string(),
         userId: t.arg.int({ required: true }),

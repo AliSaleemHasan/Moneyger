@@ -53,20 +53,20 @@ export default function AccountsTable() {
   if (loading) return <p>loading..</p>;
 
   return (
-    <div className="mx-auto  space-y-8 w-full">
+    <div className="mx-auto  space-y-8 w-full text-foreground">
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+        <table className="min-w-full divide-y ">
+          <thead>
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                 Account Name
               </th>
-              <th className="text-right px-6 py-3  text-xs font-medium text-gray-700 uppercase tracking-wider">
+              <th className="text-right px-6 py-3  text-xs font-medium uppercase tracking-wider">
                 Action
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className=" divide-y ">
             {data?.accounts?.map((account: Account & { user: User }) => (
               <tr key={account.id}>
                 <td className="px-6 py-4 whitespace-nowrap flex-1">
@@ -74,7 +74,7 @@ export default function AccountsTable() {
                 </td>
                 <td
                   align="right"
-                  className="px-6 py-4 whitespace-nowrap space-x-2 flex items-end "
+                  className="px-6 py-4 whitespace-nowrap space-x-2 flex justify-end "
                 >
                   <EditAccountForm account={account} />
 
@@ -96,10 +96,7 @@ export default function AccountsTable() {
             ))}
             {data?.accounts.length === 0 && (
               <tr>
-                <td
-                  colSpan={2}
-                  className="px-6 py-4 text-center text-sm text-gray-500"
-                >
+                <td colSpan={2} className="px-6 py-4 text-center text-sm ">
                   No Accounts added yet.
                 </td>
               </tr>

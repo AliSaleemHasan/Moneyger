@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "sonner";
 import ApolloWrapper from "@/lib/apollo-client/apollo-wrapper";
-import { redirect } from "next/navigation";
-import { getUserSession } from "./actions/auth";
+import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
   title: "Moneyger",
@@ -16,12 +15,14 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={` antialiased`}>
-        <ApolloWrapper>
-          <div className="w-[100svw] ">{children}</div>
-          <Toaster />
-        </ApolloWrapper>
+        <ThemeProvider enableSystem disableTransitionOnChange>
+          <ApolloWrapper>
+            <div className="w-[100svw] ">{children}</div>
+            <Toaster />
+          </ApolloWrapper>
+        </ThemeProvider>
       </body>
     </html>
   );

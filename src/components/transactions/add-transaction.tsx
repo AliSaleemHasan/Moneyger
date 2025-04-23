@@ -19,10 +19,7 @@ export default function AddTransaction() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          className="rounded-full p-3 font-bold cursor-pointer border-primary border-2 hover:shadow-2xl"
-        >
+        <Button className="rounded-full p-3 font-bold cursor-pointer border-primary text-xl">
           +
         </Button>
       </DialogTrigger>
