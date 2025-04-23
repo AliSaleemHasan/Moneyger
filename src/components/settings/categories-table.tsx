@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { SplineIcon } from "lucide-react";
 import { Category, User } from "generated";
 import { UserContext } from "../authnetication/auth-provider";
+import EditCategoryForm from "./edit-category-form";
 
 const query = gql`
   query getCategories($userId: Int) {
@@ -35,7 +36,6 @@ export default function CategoriesTable() {
   const handleDelete = async (cat: Category & { user: User }) => {
     setWaitingDelete(cat.id);
     const result = await deleteCategory(cat);
-    console.log(result);
 
     if (!result.success) {
       toast("There was a problem deleting this category, please try again", {
@@ -75,11 +75,10 @@ export default function CategoriesTable() {
                 </td>
                 <td
                   align="right"
-                  className="px-6 py-4 whitespace-nowrap space-x-2"
+                  className="px-6 py-4 whitespace-nowrap space-x-2 flex items-end "
                 >
-                  <Button variant="outline" size="sm">
-                    Edit
-                  </Button>
+                  <EditCategoryForm category={cat} />
+
                   <Button
                     variant="destructive"
                     size="sm"

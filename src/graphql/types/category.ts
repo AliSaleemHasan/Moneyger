@@ -62,6 +62,32 @@ builder.mutationType({
 
 builder.mutationType({
   fields: (t) => ({
+    updateCategory: t.prismaField({
+      type: "Category",
+      args: {
+        id: t.arg.int({ required: true }),
+        name: t.arg.string({ required: true }),
+        description: t.arg.string(),
+        userId: t.arg.int({ required: true }),
+      },
+
+      resolve: async (query, _root, args, context) => {
+        return prisma.category.update({
+          data: {
+            name: args.name,
+            description: args.description,
+            user: { connect: { id: args.userId } },
+          },
+          ...query,
+          where: { id: args.id },
+        });
+      },
+    }),
+  }),
+});
+
+builder.mutationType({
+  fields: (t) => ({
     deleteCategory: t.prismaField({
       type: "Category",
       args: {

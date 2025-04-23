@@ -57,6 +57,60 @@ export async function addCategory(state: unknown, formData: FormData) {
   }
 }
 
+export async function editCategory(state: unknown, formData: FormData) {
+  const { user, authenticated } = await getUserSession();
+
+  if (!authenticated || !user?.id) redirect("/login");
+
+  const values = {
+    name: formData.get("name"),
+    description: formData.get("description"),
+    id: formData.get("id"),
+  };
+
+  const result = CategorySchema.safeParse(values);
+
+  if (!result.success) {
+    // Return validation errors
+    return { errors: result.error.flatten().fieldErrors };
+  }
+
+  const UPDATE_CATEGORY_MUTATION = gql`
+    mutation UpdateCategory(
+      $id: Int!
+      $userId: Int!
+      $name: String!
+      $description: String
+    ) {
+      updateCategory(
+        id: $id
+        userId: $userId
+        name: $name
+        description: $description
+      ) {
+        name
+        description
+      }
+    }
+  `;
+
+  try {
+    const { data } = await client.mutate({
+      mutation: UPDATE_CATEGORY_MUTATION,
+      variables: {
+        id: Number(values?.id),
+        userId: +user.id,
+        name: values.name,
+        description: values.description,
+      },
+      refetchQueries: ["getCategories"],
+    });
+    return { ...data, done: true };
+  } catch (error) {
+    throw error;
+  }
+}
+
 export async function deleteCategory(cat: Category & { user: User }) {
   const { user, authenticated } = await getUserSession();
   console.log(user?.id, cat.user.id, cat);
