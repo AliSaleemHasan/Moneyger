@@ -1,5 +1,4 @@
 import builder from "@/graphql/builder";
-import { resolve } from "path";
 builder.prismaObject("Category", {
   fields: (t) => ({
     id: t.exposeID("id"),
@@ -28,12 +27,10 @@ builder.queryField("categories", (t) =>
   t.prismaField({
     type: ["Category"],
     args: {
-      take: t.arg.int({ required: false }),
-      skip: t.arg.int({ required: false }),
-      name: t.arg.string({ required: false }),
+      userId: t.arg.int(),
     },
-    resolve: (query, _root, { take, skip, name }, ctx) => {
-      const where = name ? { name: { contains: name } } : {};
+    resolve: (query, _root, { userId }, ctx) => {
+      const where = userId ? { userId } : {};
       return prisma.category.findMany({ ...query, where });
     },
   })
@@ -58,6 +55,20 @@ builder.mutationType({
           },
           ...query,
         });
+      },
+    }),
+  }),
+});
+
+builder.mutationType({
+  fields: (t) => ({
+    deleteCategory: t.prismaField({
+      type: "Category",
+      args: {
+        id: t.arg.int({ required: true }),
+      },
+      resolve: async (query, _root, args, context) => {
+        return prisma.category.delete({ ...query, where: { id: args.id } });
       },
     }),
   }),

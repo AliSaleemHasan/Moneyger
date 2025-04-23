@@ -52,9 +52,9 @@ export default function AddTransaction() {
                 placeholder="Enter amount"
                 disabled={pending}
               />
-              {state?.errors?.amount && (
+              {/* {state?.errors?.amount && (
                 <p className="text-sm text-red-500">{state.errors.amount}</p>
-              )}
+              )} */}
             </div>
 
             {/* Category as a Select */}
@@ -75,9 +75,9 @@ export default function AddTransaction() {
                   <SelectItem value="Utilities">Utilities</SelectItem>
                 </SelectContent>
               </Select>
-              {state?.errors?.category && (
+              {/* {state?.errors?.category && (
                 <p className="text-sm text-red-500">{state.errors.category}</p>
-              )}
+              )} */}
             </div>
 
             {/* Account as a Select */}
@@ -97,9 +97,9 @@ export default function AddTransaction() {
                   <SelectItem value="Credit">Credit</SelectItem>
                 </SelectContent>
               </Select>
-              {state?.errors?.account && (
+              {/* {state?.errors?.account && (
                 <p className="text-sm text-red-500">{state.errors.account}</p>
-              )}
+              )} */}
             </div>
 
             {/* Note Field */}
@@ -112,9 +112,9 @@ export default function AddTransaction() {
                 placeholder="Add a note"
                 disabled={pending}
               />
-              {state?.errors?.note && (
+              {/* {state?.errors?.note && (
                 <p className="text-sm text-red-500">{state.errors.note}</p>
-              )}
+              )} */}
             </div>
 
             {/* Form Submit Button */}

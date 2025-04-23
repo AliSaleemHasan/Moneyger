@@ -1,5 +1,5 @@
 "use server";
-import { User } from "@/prisma/@/generated/prisma";
+import { User } from "generated";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 // import { SessionPayload } from "@/app/lib/definitions";
@@ -72,7 +72,6 @@ export async function decrypt(session: string | undefined = "") {
 export async function isAuthenticated() {
   const session = (await cookies()).get("session")?.value;
   const payload = await decrypt(session);
-  console.log(session, payload);
   if (!payload) return { authenticated: false };
   else return { user: payload.user, authenticated: true };
 }

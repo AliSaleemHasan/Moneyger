@@ -1,35 +1,56 @@
 "use client";
-
-import { useActionState } from "react";
-import { useState } from "react";
+import { useActionState, useContext, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 import { deleteCategory } from "@/app/actions/category";
 import { gql, useQuery } from "@apollo/client";
+import { toast } from "sonner";
+import { SplineIcon } from "lucide-react";
+import { Category, User } from "generated";
+import { UserContext } from "../authnetication/auth-provider";
 
 const query = gql`
-  query getCategories {
-    categories {
+  query getCategories($userId: Int) {
+    categories(userId: $userId) {
       id
       name
       description
+      user {
+        id
+        name
+      }
     }
   }
 `;
 export default function CategoriesTable() {
-  const { loading, error, data } = useQuery(query);
+  const user = useContext(UserContext);
 
-  const [deleteState, deleteAction, deletePending] = useActionState(
-    deleteCategory,
-    undefined
-  );
+  const { loading, error, data } = useQuery(query, {
+    refetchWritePolicy: "overwrite",
+    variables: { userId: user?.id },
+  });
 
-  const handleDelete = async (id: number) => {
-    const formData = new FormData();
-    formData.append("id", id.toString());
-    const result: any = await deleteAction(formData);
+  const [waitingDelete, setWaitingDelete] = useState<number>(0);
+
+  const handleDelete = async (cat: Category & { user: User }) => {
+    setWaitingDelete(cat.id);
+    const result = await deleteCategory(cat);
+    console.log(result);
+
+    if (!result.success) {
+      toast("There was a problem deleting this category, please try again", {
+        action: {
+          label: "Retry",
+          onClick: () => handleDelete(cat),
+        },
+      });
+    }
+    setWaitingDelete(0);
   };
 
+  if (error) {
+    console.log(error);
+  }
   if (loading) return <p>loading..</p>;
 
   return (
@@ -47,7 +68,7 @@ export default function CategoriesTable() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {data.categories?.map((cat: any) => (
+            {data?.categories?.map((cat: Category & { user: User }) => (
               <tr key={cat.id}>
                 <td className="px-6 py-4 whitespace-nowrap flex-1">
                   {cat.name}
@@ -62,15 +83,20 @@ export default function CategoriesTable() {
                   <Button
                     variant="destructive"
                     size="sm"
-                    onClick={() => handleDelete(cat.id)}
-                    disabled={deletePending}
+                    className="cursor-pointer"
+                    onClick={() => handleDelete(cat)}
+                    disabled={!!waitingDelete}
                   >
-                    Delete
+                    {waitingDelete === cat.id ? (
+                      <SplineIcon className="animate-spin"></SplineIcon>
+                    ) : (
+                      "Delete"
+                    )}
                   </Button>
                 </td>
               </tr>
             ))}
-            {data.categories.length === 0 && (
+            {data?.categories.length === 0 && (
               <tr>
                 <td
                   colSpan={2}
