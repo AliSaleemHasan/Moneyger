@@ -1,27 +1,56 @@
 "use client";
-
-import { useActionState } from "react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Button } from "@/components/ui/button";
 
+import { gql, useQuery } from "@apollo/client";
+import { toast } from "sonner";
+import { SplineIcon } from "lucide-react";
+import { Account, User } from "generated";
+import { UserContext } from "../authnetication/auth-provider";
 import { deleteAccount } from "@/app/actions/Accounts";
+import EditAccountForm from "./edot-account-form";
 
-export default function AccountsTable() {
-  const [accounts, setAccounts] = useState([{ name: "test", id: "1" }]);
-
-  const [deleteState, deleteAction, deletePending] = useActionState(
-    deleteAccount,
-    undefined
-  );
-
-  const handleDelete = async (id: number) => {
-    const formData = new FormData();
-    formData.append("id", id.toString());
-    const result: any = await deleteAction(formData);
-    if (result.success) {
-      setAccounts((prev) => prev.filter((acc: any) => acc.id !== id));
+const query = gql`
+  query getAccounts($userId: Int) {
+    accounts(userId: $userId) {
+      id
+      name
+      user {
+        id
+        name
+      }
     }
+  }
+`;
+export default function AccountsTable() {
+  const user = useContext(UserContext);
+
+  const { loading, error, data } = useQuery(query, {
+    refetchWritePolicy: "overwrite",
+    variables: { userId: user?.id },
+  });
+
+  const [waitingDelete, setWaitingDelete] = useState<number>(0);
+
+  const handleDelete = async (acct: Account & { user: User }) => {
+    setWaitingDelete(acct.id);
+    const result = await deleteAccount(acct);
+
+    if (!result.success) {
+      toast("There was a problem deleting this category, please try again", {
+        action: {
+          label: "Retry",
+          onClick: () => handleDelete(acct),
+        },
+      });
+    }
+    setWaitingDelete(0);
   };
+
+  if (error) {
+    console.log(error);
+  }
+  if (loading) return <p>loading..</p>;
 
   return (
     <div className="mx-auto  space-y-8 w-full">
@@ -38,36 +67,40 @@ export default function AccountsTable() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {accounts.map((acc: any) => (
-              <tr key={acc.id}>
+            {data?.accounts?.map((account: Account & { user: User }) => (
+              <tr key={account.id}>
                 <td className="px-6 py-4 whitespace-nowrap flex-1">
-                  {acc.name}
+                  {account.name}
                 </td>
                 <td
                   align="right"
-                  className="px-6 py-4 whitespace-nowrap space-x-2"
+                  className="px-6 py-4 whitespace-nowrap space-x-2 flex items-end "
                 >
-                  <Button variant="outline" size="sm">
-                    Edit
-                  </Button>
+                  <EditAccountForm account={account} />
+
                   <Button
                     variant="destructive"
                     size="sm"
-                    onClick={() => handleDelete(acc.id)}
-                    disabled={deletePending}
+                    className="cursor-pointer"
+                    onClick={() => handleDelete(account)}
+                    disabled={!!waitingDelete}
                   >
-                    Delete
+                    {waitingDelete === account.id ? (
+                      <SplineIcon className="animate-spin"></SplineIcon>
+                    ) : (
+                      "Delete"
+                    )}
                   </Button>
                 </td>
               </tr>
             ))}
-            {accounts.length === 0 && (
+            {data?.accounts.length === 0 && (
               <tr>
                 <td
                   colSpan={2}
                   className="px-6 py-4 text-center text-sm text-gray-500"
                 >
-                  No accounts added yet.
+                  No Accounts added yet.
                 </td>
               </tr>
             )}

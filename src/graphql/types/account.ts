@@ -1,6 +1,5 @@
 import builder from "../builder";
-// Define the Account type.
-// Exposes id and name and the relations to its owner (User) and its records.
+
 builder.prismaObject("Account", {
   fields: (t) => ({
     id: t.exposeID("id"),
@@ -17,21 +16,18 @@ builder.queryField("account", (t) =>
       name: t.arg.string({ required: true }),
     },
     resolve: (query, _root, { name }, ctx) => {
-      return prisma.account.findFirst({ ...query, where: { name } });
+      return prisma.account.findFirst({ ...query, where: { name: name } });
     },
   })
 );
-
 builder.queryField("accounts", (t) =>
   t.prismaField({
     type: ["Account"],
     args: {
-      take: t.arg.int({ required: false }),
-      skip: t.arg.int({ required: false }),
-      name: t.arg.string({ required: false }),
+      userId: t.arg.int(),
     },
-    resolve: (query, _root, { take, skip, name }, ctx) => {
-      const where = name ? { name: { contains: name } } : {};
+    resolve: (query, _root, { userId }, ctx) => {
+      const where = userId ? { userId } : {};
       return prisma.account.findMany({ ...query, where });
     },
   })
@@ -45,14 +41,54 @@ builder.mutationType({
         name: t.arg.string({ required: true }),
         userId: t.arg.int({ required: true }),
       },
-      resolve: async (query, _root, { name, userId }, ctx) => {
+
+      resolve: async (query, _root, args, context) => {
         return prisma.account.create({
           data: {
-            name,
-            user: { connect: { id: userId } },
+            name: args.name,
+            user: { connect: { id: args.userId } },
           },
           ...query,
         });
+      },
+    }),
+  }),
+});
+
+builder.mutationType({
+  fields: (t) => ({
+    updateAccount: t.prismaField({
+      type: "Account",
+      args: {
+        id: t.arg.int({ required: true }),
+
+        name: t.arg.string({ required: true }),
+        userId: t.arg.int({ required: true }),
+      },
+
+      resolve: async (query, _root, args, context) => {
+        return prisma.account.update({
+          data: {
+            name: args.name,
+            user: { connect: { id: args.userId } },
+          },
+          ...query,
+          where: { id: args.id },
+        });
+      },
+    }),
+  }),
+});
+
+builder.mutationType({
+  fields: (t) => ({
+    deleteAccount: t.prismaField({
+      type: "Account",
+      args: {
+        id: t.arg.int({ required: true }),
+      },
+      resolve: async (query, _root, args, context) => {
+        return prisma.account.delete({ ...query, where: { id: args.id } });
       },
     }),
   }),

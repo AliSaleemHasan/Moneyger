@@ -1,47 +1,114 @@
-import { z } from "zod";
+// app/actions/Accounts.ts
+import { client } from "@/lib/apollo-client/apollo-client";
+import { AccountsSchema } from "@/lib/definitions";
+import { gql } from "@apollo/client";
+import { getUserSession } from "./auth";
+import { redirect } from "next/navigation";
+import { User, Account } from "generated";
 
-const AccountSchema = z.object({
-  name: z.string().nonempty("Name is required"),
-});
-
-// Simulate a database with an in-memory array
-let accounts: any = [];
-let idCounter = 1;
-
-/**
- */
 export async function addAccount(state: unknown, formData: FormData) {
+  const { user, authenticated } = await getUserSession();
+
+  if (!authenticated || !user?.id) redirect("/login");
+
   const values = {
     name: formData.get("name"),
-    description: formData.get("description"),
   };
 
-  const result = AccountSchema.safeParse(values);
+  const result = AccountsSchema.safeParse(values);
 
   if (!result.success) {
     // Return validation errors
     return { errors: result.error.flatten().fieldErrors };
   }
 
-  // Simulate database insertion. In production, you’d use your DB client.
-  const newCategory = { id: idCounter++, ...result.data };
-  accounts.push(newCategory);
-  return { success: true, newCategory };
+  const CREATE_ACCOUNT_MUTATION = gql`
+    mutation CreateAccount($userId: Int!, $name: String!) {
+      createAccount(userId: $userId, name: $name) {
+        name
+      }
+    }
+  `;
+
+  try {
+    const { data } = await client.mutate({
+      mutation: CREATE_ACCOUNT_MUTATION,
+      variables: {
+        userId: +user.id,
+        name: values.name,
+      },
+      refetchQueries: ["getAccounts"],
+    });
+    return data;
+  } catch (error) {
+    throw error;
+  }
 }
 
-/**
- * getAccount: returns the list of accounts.
- */
-export async function getAccount() {
-  return accounts;
+export async function editAccount(state: unknown, formData: FormData) {
+  const { user, authenticated } = await getUserSession();
+
+  if (!authenticated || !user?.id) redirect("/login");
+
+  const values = {
+    name: formData.get("name"),
+    id: formData.get("id"),
+  };
+
+  const result = AccountsSchema.safeParse(values);
+
+  if (!result.success) {
+    // Return validation errors
+    return { errors: result.error.flatten().fieldErrors };
+  }
+
+  const UPDATE_ACCOUNT_MUTATION = gql`
+    mutation UpdateAccount($id: Int!, $userId: Int!, $name: String!) {
+      updateAccount(id: $id, userId: $userId, name: $name) {
+        name
+      }
+    }
+  `;
+
+  try {
+    const { data } = await client.mutate({
+      mutation: UPDATE_ACCOUNT_MUTATION,
+      variables: {
+        id: Number(values?.id),
+        userId: +user.id,
+        name: values.name,
+      },
+      refetchQueries: ["getAccounts"],
+    });
+    return { ...data, done: true };
+  } catch (error) {
+    throw error;
+  }
 }
 
-/**
- * deleteAccount: deletes a category by its id.
- */
-export async function deleteAccount(state: unknown, formData: FormData) {
-  const id = formData.get("id");
-  const numericId = Number(id);
-  accounts = accounts.filter((acc: any) => acc.id !== numericId);
-  return { success: true };
+export async function deleteAccount(cat: Account & { user: User }) {
+  const { user, authenticated } = await getUserSession();
+  console.log(user?.id, cat.user.id, cat);
+  if (!cat.id || +cat.user.id !== user?.id)
+    return { success: false, error: "Permission Denied!" };
+
+  if (!user || !authenticated) redirect("/login");
+
+  const DELETE_ACCOUNT_MUTATION = gql`
+    mutation deleteAccount($id: Int!) {
+      deleteAccount(id: $id) {
+        id
+        name
+      }
+    }
+  `;
+
+  const { data } = await client.mutate({
+    mutation: DELETE_ACCOUNT_MUTATION,
+    variables: {
+      id: +cat.id,
+    },
+    refetchQueries: ["getAccounts"],
+  });
+  return { data, success: true };
 }

@@ -47,3 +47,8 @@ export const CategorySchema = z.object({
   name: z.string().nonempty("Name is required"),
   description: z.string().optional(),
 });
+
+export const AccountsSchema = z.object({
+  name: z.string().nonempty("Name is required"),
+  description: z.string().optional(),
+});
