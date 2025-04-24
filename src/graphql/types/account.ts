@@ -24,10 +24,10 @@ builder.queryField("accounts", (t) =>
   t.prismaField({
     type: ["Account"],
     args: {
-      userId: t.arg.int(),
+      userId: t.arg.int({ required: true }),
     },
     resolve: (query, _root, { userId }, ctx) => {
-      const where = userId ? { userId } : {};
+      const where = { OR: [{ userId: null }, { userId }] };
       return prisma.account.findMany({ ...query, where });
     },
   })

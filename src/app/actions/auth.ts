@@ -76,7 +76,6 @@ export async function signin(
 
   // If any form fields are invalid, return early
   if (!validatedFields.success) {
-    console.log(validatedFields.error.flatten().fieldErrors);
     return {
       errors: validatedFields.error.flatten().fieldErrors,
     };
@@ -117,5 +116,12 @@ export async function logout() {
 }
 
 export async function getUserSession() {
-  return isAuthenticated();
+  const { authenticated, user } = await isAuthenticated();
+  try {
+    const db_user = await prisma.user.findUnique({ where: { id: user?.id } });
+    if (!db_user) return { authenticated: false };
+    return { authenticated, user };
+  } catch {
+    return { authenticated: false };
+  }
 }

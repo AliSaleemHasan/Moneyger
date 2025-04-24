@@ -29,6 +29,7 @@ model User {
   email     String  @unique
   accounts Account[]
   categories Category[]
+  records Record[]
 }
 
 enum Type {
@@ -41,16 +42,16 @@ model Account{
   id       Int      @id @default(autoincrement())
   name     String @unique
   // add forign key to user
-  user     User @relation(fields: [userId], references: [id])
-  userId   Int
+  user     User? @relation(fields: [userId], references: [id])
+  userId   Int?
   records  Record[]
 }
 
 model Category{
   id Int @id @default(autoincrement())
   name String @unique
-  user User @relation(fields: [userId], references: [id])
-  userId Int
+  user User? @relation(fields: [userId], references: [id])
+  userId Int?
   description String?
   records Record[]
 }
@@ -63,5 +64,8 @@ model Record {
   accountId   Int
   category    Category @relation(fields: [categoryId], references: [id])
   categoryId  Int
-
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+  note String
+  
 }

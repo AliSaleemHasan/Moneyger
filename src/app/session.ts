@@ -72,6 +72,7 @@ export async function decrypt(session: string | undefined = "") {
 export async function isAuthenticated() {
   const session = (await cookies()).get("session")?.value;
   const payload = await decrypt(session);
+
   if (!payload) return { authenticated: false };
   else return { user: payload.user, authenticated: true };
 }

@@ -13,6 +13,9 @@ builder.prismaObject("Record", {
     }),
     account: t.relation("account"),
     category: t.relation("category"),
+    user: t.relation("user"),
+    note: t.exposeString("note"),
+    createdAt: t.expose("createdAt", { type: "Date" }),
   }),
 });
 
@@ -34,11 +37,16 @@ builder.queryField("records", (t) =>
     type: "Record",
     cursor: "id",
     args: {
-      type: t.arg({ type: Type, required: false }),
+      userId: t.arg.int({ required: true }),
     },
-    resolve: (query, _root, { type }, ctx) => {
-      const where = type ? { type } : {};
-      return prisma.record.findMany({ ...query, where });
+    resolve: (query, _root, { userId }, ctx) => {
+      return prisma.record.findMany({
+        ...query,
+        where: {
+          user: { id: userId },
+        },
+        orderBy: { createdAt: "desc" },
+      });
     },
   })
 );
@@ -48,11 +56,12 @@ builder.mutationType({
     createRecord: t.prismaField({
       type: "Record",
       args: {
-        id: t.arg.int({ required: true }),
         amount: t.arg.float({ required: true }),
         type: t.arg({ type: Type, required: true }),
         accountId: t.arg.int({ required: true }),
         categoryId: t.arg.int({ required: true }),
+        userId: t.arg.int({ required: true }),
+        note: t.arg.string({ required: true }),
       },
       resolve: async (query, _root, args, ctx) => {
         return prisma.record.create({
@@ -60,7 +69,10 @@ builder.mutationType({
             amount: args.amount,
             type: args.type,
             account: { connect: { id: args.accountId } },
+            user: { connect: { id: args.userId } },
             category: { connect: { id: args.categoryId } },
+            note: args.note,
+            createdAt: new Date(),
           },
           ...query,
         });

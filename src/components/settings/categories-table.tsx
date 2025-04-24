@@ -9,24 +9,12 @@ import { SplineIcon } from "lucide-react";
 import { Category, User } from "generated";
 import { UserContext } from "../authnetication/auth-provider";
 import EditCategoryForm from "./edit-category-form";
+import { getCategories } from "@/lib/client-queries";
 
-const query = gql`
-  query getCategories($userId: Int) {
-    categories(userId: $userId) {
-      id
-      name
-      description
-      user {
-        id
-        name
-      }
-    }
-  }
-`;
 export default function CategoriesTable() {
   const user = useContext(UserContext);
 
-  const { loading, error, data } = useQuery(query, {
+  const { loading, error, data } = useQuery(getCategories, {
     refetchWritePolicy: "overwrite",
     variables: { userId: user?.id },
   });

@@ -8,24 +8,13 @@ import { SplineIcon } from "lucide-react";
 import { Account, User } from "generated";
 import { UserContext } from "../authnetication/auth-provider";
 import { deleteAccount } from "@/app/actions/Accounts";
-import EditAccountForm from "./edot-account-form";
+import EditAccountForm from "./edit-account-form";
+import { getAccounts } from "@/lib/client-queries";
 
-const query = gql`
-  query getAccounts($userId: Int) {
-    accounts(userId: $userId) {
-      id
-      name
-      user {
-        id
-        name
-      }
-    }
-  }
-`;
 export default function AccountsTable() {
   const user = useContext(UserContext);
 
-  const { loading, error, data } = useQuery(query, {
+  const { loading, error, data } = useQuery(getAccounts, {
     refetchWritePolicy: "overwrite",
     variables: { userId: user?.id },
   });

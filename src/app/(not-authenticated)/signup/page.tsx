@@ -7,7 +7,7 @@ export default function SignupPage() {
   return (
     <>
       <Link
-        href="/authentication/login"
+        href="/login"
         className={cn(
           buttonVariants({ variant: "ghost" }),
           "absolute  right-6 top-6 lg:right-12 lg:top-12 text-white lg:text-black z-40"

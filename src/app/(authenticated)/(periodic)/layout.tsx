@@ -12,7 +12,6 @@ const layout = ({ children }: Readonly<{ children: ReactNode }>) => {
         </h2>
         <div className="flex items-center space-x-2">
           <CalendarDateRangePicker />
-          <Button>Download</Button>
         </div>
       </div>
       <div className="h-full w-full  px-4">

@@ -1,15 +1,25 @@
 // prisma/seed.ts
 
 import prisma from "@/prisma/prisma";
+import { Category, Account } from "generated";
+const defaultCategories: Partial<Category>[] = [
+  { description: "Car, Plane, Train ..etc", name: "Transportation" },
+  { description: "Furniture, Electronics ...etc ", name: "HouseHold" },
+  { description: "Phone, landline, WIFI", name: "Communication" },
+  { description: "Friend, Fellowship, Alumni, Dues", name: "Social Life" },
+  { description: "Dogs, Cats, Birds ..etc", name: "Pets" },
+  { description: "Books, Moview, Music, Apps", name: "Culture" },
+  { description: "Clothing, Fashion, Shoews, Laundry", name: "Apparel" },
+];
 
+const defaultAccounts: Partial<Account>[] = [
+  { name: "Revolute" },
+  { name: "Cash" },
+  { name: "OTP" },
+];
 async function main() {
-  await prisma.user.create({
-    data: {
-      email: `testemail@gmail.com`,
-      name: `Test User`,
-      password: `testpassword`,
-    },
-  });
+  await prisma.category.createMany({ data: defaultCategories });
+  await prisma.account.createMany({ data: defaultAccounts });
 }
 
 main()

@@ -32,6 +32,17 @@ export const SigninFormSchema = z.object({
     .trim(),
 });
 
+export const AddTransactionSchema = z.object({
+  amount: z.number().min(1, "Amount must be added!"),
+  type: z.enum(["INCOME", "EXPENSE"]), // Adjust these values to your actual enum
+  accountId: z.number().int(),
+  categoryId: z.number().int(),
+  userId: z.number(),
+  note: z
+    .string({ message: "Note is required!" })
+    .min(4, "Please add any note to remember this transaction well!"),
+});
+
 export type AuthenticationFormState =
   | {
       errors?: {
@@ -43,6 +54,19 @@ export type AuthenticationFormState =
     }
   | undefined;
 
+export type TransactionFormState =
+  | {
+      errors?: {
+        amount?: string[];
+        type?: string[];
+        accountId?: string[];
+        categoryId?: string[];
+        userId?: string[];
+        note?: string[];
+      };
+      message?: string;
+    }
+  | undefined;
 export const CategorySchema = z.object({
   name: z.string().nonempty("Name is required"),
   description: z.string().optional(),

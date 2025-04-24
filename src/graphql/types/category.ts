@@ -27,10 +27,10 @@ builder.queryField("categories", (t) =>
   t.prismaField({
     type: ["Category"],
     args: {
-      userId: t.arg.int(),
+      userId: t.arg.int({ required: true }),
     },
     resolve: (query, _root, { userId }, ctx) => {
-      const where = userId ? { userId } : {};
+      const where = { OR: [{ userId: null }, { userId }] };
       return prisma.category.findMany({ ...query, where });
     },
   })

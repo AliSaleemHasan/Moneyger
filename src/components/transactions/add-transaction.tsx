@@ -1,6 +1,11 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -10,118 +15,192 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { useActionState } from "react";
+import { useActionState, useContext, useEffect, useState } from "react";
 import { DialogTitle } from "@radix-ui/react-dialog";
-
+import { useQuery } from "@apollo/client";
+import { getAccounts, getCategories } from "@/lib/client-queries";
+import { UserContext } from "../authnetication/auth-provider";
+import { Loader2 } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import { addTransaction } from "@/app/actions/transactions";
+import { Type } from "generated";
+import FormError from "../ui/form-error";
+import { toast } from "sonner";
 export default function AddTransaction() {
-  const [state, action, pending] = useActionState(() => {}, undefined);
+  const [selected, setSelected] = useState("EXPENSE");
+  const user = useContext(UserContext);
+  const {
+    loading: categoriesLoading,
+    error: categoriesError,
+    data: categoriesData,
+  } = useQuery(getCategories, {
+    fetchPolicy: "cache-and-network",
+
+    variables: { userId: user?.id },
+  });
+
+  const {
+    loading: accountsLoading,
+    error: accountsError,
+    data: accountsData,
+  } = useQuery(getAccounts, {
+    fetchPolicy: "cache-and-network",
+    variables: { userId: user?.id },
+  });
+
+  const [state, action, pending] = useActionState(addTransaction, undefined);
+  const [open, setOpen] = useState<boolean>(false);
   const date = new Date().toLocaleDateString();
+
+  useEffect(() => {
+    if (state?.message) {
+      toast(state.message);
+      setOpen(false);
+    }
+  }, [state]);
+  if (
+    categoriesLoading ||
+    accountsLoading ||
+    !categoriesData.categories ||
+    !accountsData.accounts
+  )
+    return <Loader2 className="animate-spine text-primary" />;
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={(open) => setOpen(open)}>
       <DialogTrigger asChild>
         <Button className="rounded-full p-3 font-bold cursor-pointer border-primary text-xl">
           +
         </Button>
       </DialogTrigger>
-      <DialogTitle className=""></DialogTitle>
-      <DialogContent className="sm:max-w-[425px] pt-12">
-        <div className="max-w-md mx-auto w-full">
-          <div className="flex space-x-2 mb-4 [&>*]:flex-1">
-            <Button variant="outline">Income</Button>
-            <Button variant="default">Expense</Button>
-            <Button variant="outline">Transfer</Button>
+      <DialogTitle></DialogTitle>
+      <DialogContent className="sm:max-w-xl pt-12">
+        <DialogDescription></DialogDescription>
+
+        <form action={action} className="space-y-4  w-full">
+          {/* Transaction Type Radio Group */}
+          <div className="space-y-1">
+            <RadioGroup
+              name="type"
+              value={selected}
+              // Optionally leave defaultValue or integrate with reactFormStatus as required
+              defaultValue="EXPENSE"
+              className="flex items-center gap-2 pt-2"
+            >
+              {/* Income Option */}
+              <label className="flex-1 block">
+                <RadioGroupItem
+                  id="income"
+                  value="INCOME"
+                  className="sr-only peer"
+                  // You might add an onChange handler here, if necessary
+                />
+                <Button
+                  type="button"
+                  onClick={() => setSelected("INCOME")}
+                  variant={selected !== "EXPENSE" ? "default" : "outline"}
+                  className={`w-full border border-gray-300 `}
+                  // Optionally, you can still let the label click trigger the radio selection
+                >
+                  Income
+                </Button>
+              </label>
+
+              {/* Expense Option */}
+              <label className="flex-1 block">
+                <RadioGroupItem
+                  id="expense"
+                  value="EXPENSE"
+                  className="sr-only peer"
+                />
+                <Button
+                  type="button"
+                  onClick={() => setSelected("EXPENSE")}
+                  variant={selected === "EXPENSE" ? "default" : "outline"}
+                  className={`w-full border border-gray-300 XS`}
+                >
+                  Expense
+                </Button>
+              </label>
+            </RadioGroup>
           </div>
 
-          <form action={action} className="space-y-4  w-full">
-            {/* Date Field (read-only) */}
-            <div className="grid gap-1">
-              <Label htmlFor="date">Date</Label>
-              <Input id="date" name="date" value={date} readOnly />
-            </div>
+          {/* Date Field (read-only) */}
+          <div className="grid gap-1">
+            <Label htmlFor="date">Date</Label>
+            <Input id="date" name="date" value={date} readOnly disabled />
+          </div>
 
-            {/* Amount Field */}
-            <div className="grid gap-1">
-              <Label htmlFor="amount">Amount</Label>
-              <Input
-                id="amount"
-                name="amount"
-                type="number"
-                placeholder="Enter amount"
+          <div className="grid gap-1">
+            <Label htmlFor="note">Note</Label>
+            <Input
+              id="note"
+              name="note"
+              type="text"
+              placeholder="Note"
+              disabled={pending}
+            />
+          </div>
+          {state?.errors?.note && <FormError message={state.errors.note} />}
+
+          {/* Amount Field */}
+          <div className="grid gap-1">
+            <Label htmlFor="amount">Amount</Label>
+            <Input
+              id="amount"
+              name="amount"
+              type="number"
+              step={0.0001}
+              placeholder="Enter amount"
+              disabled={pending}
+            />
+          </div>
+          {state?.errors?.amount && <FormError message={state.errors.amount} />}
+          {/* Category as a Select */}
+          <div className="grid gap-1">
+            <Label htmlFor="category">Category</Label>
+            <Select name="categoryId" defaultValue="1">
+              <SelectTrigger
+                id="category"
                 disabled={pending}
-              />
-              {/* {state?.errors?.amount && (
-                <p className="text-sm text-red-500">{state.errors.amount}</p>
-              )} */}
-            </div>
+                className="w-full"
+              >
+                <SelectValue placeholder="Select Category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categoriesData?.categories?.map((cat: any) => (
+                  <SelectItem key={cat.id} value={cat.id.toString()}>
+                    {cat.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-            {/* Category as a Select */}
-            <div className="grid gap-1 ">
-              <Label htmlFor="category">Category</Label>
-              <Select name="category" defaultValue="">
-                <SelectTrigger
-                  className="w-full"
-                  id="category"
-                  disabled={pending}
-                >
-                  <SelectValue placeholder="Select Category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Food">Food</SelectItem>
-                  <SelectItem value="Transport">Transport</SelectItem>
-                  <SelectItem value="Entertainment">Entertainment</SelectItem>
-                  <SelectItem value="Utilities">Utilities</SelectItem>
-                </SelectContent>
-              </Select>
-              {/* {state?.errors?.category && (
-                <p className="text-sm text-red-500">{state.errors.category}</p>
-              )} */}
-            </div>
+          {/* Account as a Select */}
+          <div className="grid gap-1">
+            <Label htmlFor="account">Account</Label>
+            <Select name="accountId" defaultValue="1">
+              <SelectTrigger id="account" disabled={pending} className="w-full">
+                <SelectValue placeholder="Select Account" />
+              </SelectTrigger>
+              <SelectContent>
+                {accountsData.accounts?.map((acc: any) => (
+                  <SelectItem key={acc.id} value={acc.id.toString()}>
+                    {acc.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-            {/* Account as a Select */}
-            <div className="grid gap-1">
-              <Label htmlFor="account">Account</Label>
-              <Select name="account" defaultValue="">
-                <SelectTrigger
-                  className="w-full"
-                  id="account"
-                  disabled={pending}
-                >
-                  <SelectValue placeholder="Select Account" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Checking">Checking</SelectItem>
-                  <SelectItem value="Savings">Savings</SelectItem>
-                  <SelectItem value="Credit">Credit</SelectItem>
-                </SelectContent>
-              </Select>
-              {/* {state?.errors?.account && (
-                <p className="text-sm text-red-500">{state.errors.account}</p>
-              )} */}
-            </div>
-
-            {/* Note Field */}
-            <div className="grid gap-1">
-              <Label htmlFor="note">Note</Label>
-              <Input
-                id="note"
-                name="note"
-                type="text"
-                placeholder="Add a note"
-                disabled={pending}
-              />
-              {/* {state?.errors?.note && (
-                <p className="text-sm text-red-500">{state.errors.note}</p>
-              )} */}
-            </div>
-
-            {/* Form Submit Button */}
-            <div className="flex justify-end mt-6">
-              <Button type="submit" disabled={pending}>
-                {pending ? "Submitting..." : "Continue"}
-              </Button>
-            </div>
-          </form>
-        </div>
+          {/* Form Submit Button */}
+          <div className="flex justify-end mt-6">
+            <Button type="submit" disabled={pending}>
+              {pending ? "Submitting..." : "Add"}
+            </Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   );
