@@ -1,6 +1,5 @@
 import { CalendarDateRangePicker } from "@/components/dashboard/date-range-picker";
 import AddTransaction from "@/components/transactions/add-transaction";
-import { Button } from "@/components/ui/button";
 import React, { ReactNode } from "react";
 
 const layout = ({ children }: Readonly<{ children: ReactNode }>) => {

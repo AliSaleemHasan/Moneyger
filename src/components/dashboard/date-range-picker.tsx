@@ -9,15 +9,20 @@ import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { Calendar } from "../ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { useRouter } from "next/navigation";
 
 export function CalendarDateRangePicker({
   className,
 }: React.HTMLAttributes<HTMLDivElement>) {
+  const router = useRouter();
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: new Date(2023, 0, 20),
     to: addDays(new Date(2023, 0, 20), 20),
   });
 
+  React.useEffect(() => {
+    router.push("?from=" + date?.from + "&to=" + date?.to);
+  }, [date]);
   return (
     <div className={cn("grid gap-2", className)}>
       <Popover>

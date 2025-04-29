@@ -58,3 +58,33 @@ export const getTransactions = gql`
     }
   }
 `;
+
+export const GET_STATISTICS = gql`
+  query GetStatistics($userId: Int!, $from: String!, $to: String!) {
+    statistics(userId: $userId, from: $from, to: $to) {
+      totalExpenses
+      totalIncome
+      maxExpenseDay {
+        date
+        amount
+      }
+      topExpenseCategory {
+        categoryId
+        totalSpent
+      }
+      topExpenseAccount {
+        accountId
+        total
+      }
+      topIncomeAccount {
+        accountId
+        total
+      }
+      dailyTotals {
+        date
+        totalExpenses
+        totalIncome
+      }
+    }
+  }
+`;

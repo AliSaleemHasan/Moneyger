@@ -1,64 +1,54 @@
-import { TabsContent } from "@/components/ui/tabs";
-import React from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+"use client";
+import React, { useContext } from "react";
 import OverviewCard from "@/components/dashboard/overview-card";
 import { Overview } from "@/components/dashboard/overview";
-import { RecentSales } from "@/components/dashboard/recent-sales";
-import { ChartAreaInteractive } from "@/components/dashboard/chart-area-interactive";
+import { useQuery } from "@apollo/client";
+import { GET_STATISTICS } from "@/lib/client-queries";
+import { UserContext } from "@/components/authnetication/auth-provider";
 
 const OverviewStatisticTab = () => {
+  const user = useContext(UserContext);
+  const { loading, error, data } = useQuery(GET_STATISTICS, {
+    variables: {
+      userId: user?.id,
+      from: "2024-02-01T00:00:00.000Z",
+      to: "2026-12-31T23:59:59.999Z",
+    },
+  });
+
+  if (loading) return <p>loading</p>;
+
+  console.log(data, error);
   return (
-    <TabsContent value="overview" className="p-2 ">
+    <>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 ">
         <OverviewCard
-          title="Total Revenue"
-          stats="+20.1% from last month"
-          value="$45,231.89"
+          title="Max Expense Day"
+          stats={data?.statistics.maxExpenseDay?.date}
+          value={data?.statistics.maxExpenseDay?.amount}
         />
         <OverviewCard
-          title="Subscriptions"
-          stats="+180.1% from last month"
-          value="+2350"
+          title="Total Expense"
+          stats=""
+          value={data?.statistics.totalExpenses}
         />
 
         <OverviewCard
-          title="Sales"
-          stats="+19% from last month"
-          value="+12,324"
+          title="Total Income"
+          stats=""
+          value={data?.statistics.totalIncome}
         />
 
         <OverviewCard
-          title="Active Now"
-          stats="+201 since last hour"
-          value="+573"
+          title="Max Expense Day"
+          stats={data?.statistics.maxExpenseDay?.date}
+          value={data?.statistics.maxExpenseDay?.amount}
         />
       </div>
-      <div className="grid gap-4 grid-cols-2 lg:grid-cols-7 mt-4 ">
-        <Card className="col-span-2 lg:col-span-5 ">
-          <CardHeader>
-            <CardTitle>Overview</CardTitle>
-          </CardHeader>
-          <CardContent className="pl-2">
-            <Overview />
-          </CardContent>
-        </Card>
-        <Card className="col-span-2 lg:col-span-2 ">
-          <CardHeader>
-            <CardTitle>Recent Sales</CardTitle>
-            <CardDescription>You made 265 sales this month.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <RecentSales />
-          </CardContent>
-        </Card>
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-8 mt-4 ">
+        <Overview data={data.statistics.dailyTotals} />
       </div>
-    </TabsContent>
+    </>
   );
 };
 
