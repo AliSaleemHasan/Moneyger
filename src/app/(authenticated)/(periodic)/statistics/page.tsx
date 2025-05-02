@@ -5,6 +5,7 @@ import { Overview } from "@/components/dashboard/overview";
 import { useQuery } from "@apollo/client";
 import { GET_STATISTICS } from "@/lib/client-queries";
 import { UserContext } from "@/components/authnetication/auth-provider";
+import { ExpenseIncomePieChart } from "@/components/dashboard/expense-income-pie";
 
 const OverviewStatisticTab = () => {
   const user = useContext(UserContext);
@@ -28,15 +29,15 @@ const OverviewStatisticTab = () => {
           value={data?.statistics.maxExpenseDay?.amount}
         />
         <OverviewCard
-          title="Total Expense"
-          stats=""
-          value={data?.statistics.totalExpenses}
+          title="Top Expense Account"
+          value={data?.statistics.topExpenseAccount.accountName}
+          stats={data?.statistics.topExpenseAccount.total}
         />
 
         <OverviewCard
-          title="Total Income"
-          stats=""
-          value={data?.statistics.totalIncome}
+          title="Top Expense Category"
+          value={data?.statistics.topExpenseCategory.categoryName}
+          stats={data?.statistics.topExpenseCategory.totalSpent}
         />
 
         <OverviewCard
@@ -47,6 +48,20 @@ const OverviewStatisticTab = () => {
       </div>
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-8 mt-4 ">
         <Overview data={data.statistics.dailyTotals} />
+        <ExpenseIncomePieChart
+          data={[
+            {
+              type: "expense",
+              value: Number(data.statistics.totalExpenses),
+              fill: "darkRed",
+            },
+            {
+              type: "income",
+              value: Number(data.statistics.totalIncome),
+              fill: "darkGreen",
+            },
+          ]}
+        />
       </div>
     </>
   );

@@ -69,15 +69,15 @@ export const GET_STATISTICS = gql`
         amount
       }
       topExpenseCategory {
-        categoryId
+        categoryName
         totalSpent
       }
       topExpenseAccount {
-        accountId
+        accountName
         total
       }
       topIncomeAccount {
-        accountId
+        accountName
         total
       }
       dailyTotals {

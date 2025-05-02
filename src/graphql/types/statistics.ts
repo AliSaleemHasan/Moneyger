@@ -6,12 +6,12 @@ interface MaxExpenseDayType {
 }
 
 interface CategorySummaryType {
-  categoryId: string;
+  categoryName: string;
   totalSpent: number;
 }
 
 interface AccountSummaryType {
-  accountId: string;
+  accountName: string;
   total: number;
 }
 
@@ -45,7 +45,7 @@ const CategorySummaryObj =
   builder.objectRef<CategorySummaryType>("CategorySummary");
 CategorySummaryObj.implement({
   fields: (t) => ({
-    categoryId: t.string({ resolve: (parent) => parent.categoryId }),
+    categoryName: t.string({ resolve: (parent) => parent.categoryName }),
     totalSpent: t.float({ resolve: (parent) => parent.totalSpent }),
   }),
 });
@@ -54,7 +54,7 @@ const AccountSummaryObj =
   builder.objectRef<AccountSummaryType>("AccountSummary");
 AccountSummaryObj.implement({
   fields: (t) => ({
-    accountId: t.string({ resolve: (parent) => parent.accountId }),
+    accountName: t.string({ resolve: (parent) => parent.accountName }),
     total: t.float({ resolve: (parent) => parent.total }),
   }),
 });
@@ -121,12 +121,20 @@ builder.queryField("statistics", (t) =>
             type: "EXPENSE",
             createdAt: { gte: fromDate, lte: toDate },
           },
+          include: {
+            category: true,
+            account: true,
+          },
         }),
         prisma.record.findMany({
           where: {
             userId,
             type: "INCOME",
             createdAt: { gte: fromDate, lte: toDate },
+          },
+          include: {
+            category: true,
+            account: true,
           },
         }),
       ]);
@@ -150,7 +158,7 @@ builder.queryField("statistics", (t) =>
 
       // 3. Group expenses by category.
       const expensesByCategory = expenses.reduce((acc, rec) => {
-        const cat = rec.categoryId;
+        const cat = rec.category.name;
         acc[cat] = (acc[cat] || 0) + rec.amount;
         return acc;
       }, {} as Record<string, number>);
@@ -161,7 +169,7 @@ builder.queryField("statistics", (t) =>
           expensesByCategory[cat] > topExpenseCategory.totalSpent
         ) {
           topExpenseCategory = {
-            categoryId: cat,
+            categoryName: cat,
             totalSpent: expensesByCategory[cat],
           };
         }
@@ -169,38 +177,38 @@ builder.queryField("statistics", (t) =>
 
       // 4. Group expenses by account.
       const expensesByAccount = expenses.reduce((acc, rec) => {
-        const accId = rec.accountId;
-        acc[accId] = (acc[accId] || 0) + rec.amount;
+        const accName = rec.account.name;
+        acc[accName] = (acc[accName] || 0) + rec.amount;
         return acc;
       }, {} as Record<string, number>);
       let topExpenseAccount: AccountSummaryType | null = null;
-      for (const accId in expensesByAccount) {
+      for (const accName in expensesByAccount) {
         if (
           !topExpenseAccount ||
-          expensesByAccount[accId] > topExpenseAccount.total
+          expensesByAccount[accName] > topExpenseAccount.total
         ) {
           topExpenseAccount = {
-            accountId: accId,
-            total: expensesByAccount[accId],
+            accountName: accName,
+            total: expensesByAccount[accName],
           };
         }
       }
 
       // 5. Group incomes by account.
       const incomesByAccount = incomes.reduce((acc, rec) => {
-        const accId = rec.accountId;
-        acc[accId] = (acc[accId] || 0) + rec.amount;
+        const accName = rec.account.name;
+        acc[accName] = (acc[accName] || 0) + rec.amount;
         return acc;
       }, {} as Record<string, number>);
       let topIncomeAccount: AccountSummaryType | null = null;
-      for (const accId in incomesByAccount) {
+      for (const accName in incomesByAccount) {
         if (
           !topIncomeAccount ||
-          incomesByAccount[accId] > topIncomeAccount.total
+          incomesByAccount[accName] > topIncomeAccount.total
         ) {
           topIncomeAccount = {
-            accountId: accId,
-            total: incomesByAccount[accId],
+            accountName: accName,
+            total: incomesByAccount[accName],
           };
         }
       }
@@ -224,6 +232,8 @@ builder.queryField("statistics", (t) =>
         }
         dailyTotalsMap[day].totalIncome += rec.amount;
       });
+
+      let totalIncomeAndExpense = totalIncome + totalExpenses;
       const dailyTotals: DailyTotalSummaryType[] = Object.keys(dailyTotalsMap)
         .map((day) => ({
           date: day,
@@ -234,8 +244,8 @@ builder.queryField("statistics", (t) =>
         );
 
       return {
-        totalExpenses,
-        totalIncome,
+        totalExpenses: (totalExpenses / totalIncomeAndExpense) * 100,
+        totalIncome: (totalIncome / totalIncomeAndExpense) * 100,
         maxExpenseDay,
         topExpenseCategory,
         topExpenseAccount,
