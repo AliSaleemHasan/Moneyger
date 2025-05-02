@@ -111,8 +111,8 @@ export async function signin(
 }
 
 export async function logout() {
-  deleteSession();
-  redirect("/authentication/login");
+  await deleteSession();
+  redirect("/login");
 }
 
 export async function getUserSession() {
