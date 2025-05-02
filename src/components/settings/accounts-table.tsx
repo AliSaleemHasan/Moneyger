@@ -65,21 +65,27 @@ export default function AccountsTable() {
                   align="right"
                   className="px-6 py-4 whitespace-nowrap space-x-2 flex justify-end "
                 >
-                  <EditAccountForm account={account} />
+                  {account.user && account.user.id !== user?.id ? (
+                    <>
+                      <EditAccountForm account={account} />
 
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    className="cursor-pointer"
-                    onClick={() => handleDelete(account)}
-                    disabled={!!waitingDelete}
-                  >
-                    {waitingDelete === account.id ? (
-                      <SplineIcon className="animate-spin"></SplineIcon>
-                    ) : (
-                      "Delete"
-                    )}
-                  </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="cursor-pointer"
+                        onClick={() => handleDelete(account)}
+                        disabled={!!waitingDelete}
+                      >
+                        {waitingDelete === account.id ? (
+                          <SplineIcon className="animate-spin"></SplineIcon>
+                        ) : (
+                          "Delete"
+                        )}
+                      </Button>
+                    </>
+                  ) : (
+                    "ـــــــــــــ"
+                  )}
                 </td>
               </tr>
             ))}

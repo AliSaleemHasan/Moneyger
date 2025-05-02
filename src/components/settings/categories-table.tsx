@@ -65,21 +65,27 @@ export default function CategoriesTable() {
                   align="right"
                   className="px-6 py-4 whitespace-nowrap space-x-2 flex justify-end "
                 >
-                  <EditCategoryForm category={cat} />
+                  {cat.user && cat.user.id === user?.id ? (
+                    <>
+                      <EditCategoryForm category={cat} />
 
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    className="cursor-pointer"
-                    onClick={() => handleDelete(cat)}
-                    disabled={!!waitingDelete}
-                  >
-                    {waitingDelete === cat.id ? (
-                      <SplineIcon className="animate-spin"></SplineIcon>
-                    ) : (
-                      "Delete"
-                    )}
-                  </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="cursor-pointer"
+                        onClick={() => handleDelete(cat)}
+                        disabled={!!waitingDelete}
+                      >
+                        {waitingDelete === cat.id ? (
+                          <SplineIcon className="animate-spin"></SplineIcon>
+                        ) : (
+                          "Delete"
+                        )}
+                      </Button>
+                    </>
+                  ) : (
+                    "ـــــــــ"
+                  )}
                 </td>
               </tr>
             ))}

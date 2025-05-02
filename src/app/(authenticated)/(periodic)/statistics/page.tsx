@@ -48,17 +48,17 @@ const OverviewStatisticTab = () => {
         />
       </div>
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-8 mt-4 ">
-        <Overview data={data.statistics?.dailyTotals} />
+        <Overview data={data?.statistics?.dailyTotals} />
         <ExpenseIncomePieChart
           data={[
             {
               type: "expense",
-              value: Number(data.statistics?.totalExpenses),
+              value: Number(data?.statistics?.totalExpenses),
               fill: "darkRed",
             },
             {
               type: "income",
-              value: Number(data.statistics?.totalIncome),
+              value: Number(data?.statistics?.totalIncome),
               fill: "darkGreen",
             },
           ]}

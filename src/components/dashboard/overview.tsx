@@ -50,7 +50,7 @@ interface IOverviewProps {
 export function Overview(props: IOverviewProps) {
   const [timeRange, setTimeRange] = React.useState("90d");
 
-  const filteredData = props.data.filter((item) => {
+  const filteredData = props.data?.filter((item) => {
     const date = new Date(item.date);
     const referenceDate = new Date();
     let daysToSubtract = 90;
