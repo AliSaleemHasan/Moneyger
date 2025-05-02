@@ -25,7 +25,6 @@ export async function addTransaction(
 
   const result = AddTransactionSchema.safeParse(values);
 
-  console.log(result);
   if (!result.success) {
     return { errors: result.error.flatten().fieldErrors };
   }

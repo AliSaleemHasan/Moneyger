@@ -88,7 +88,6 @@ export async function editAccount(state: unknown, formData: FormData) {
 
 export async function deleteAccount(cat: Account & { user: User }) {
   const { user, authenticated } = await getUserSession();
-  console.log(user?.id, cat.user.id, cat);
   if (!cat.id || +cat.user.id !== user?.id)
     return { success: false, error: "Permission Denied!" };
 

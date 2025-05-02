@@ -110,8 +110,12 @@ builder.queryField("statistics", (t) =>
       to: t.arg.string({ required: true }),
     },
     resolve: async (_root, { userId, from, to }) => {
-      const fromDate = new Date(from);
-      const toDate = new Date(to);
+      const fromDate = new Date(from).toISOString();
+      const toDate =
+        new Date(to).toISOString() || new Date(Date.now()).toISOString();
+      console.log(Date.now());
+      console.log(fromDate);
+      console.log(toDate);
 
       // Fetch records for expenses and incomes.
       const [expenses, incomes] = await Promise.all([
@@ -244,8 +248,14 @@ builder.queryField("statistics", (t) =>
         );
 
       return {
-        totalExpenses: (totalExpenses / totalIncomeAndExpense) * 100,
-        totalIncome: (totalIncome / totalIncomeAndExpense) * 100,
+        totalExpenses:
+          totalIncomeAndExpense == 0
+            ? 0
+            : (totalExpenses / totalIncomeAndExpense) * 100,
+        totalIncome:
+          totalIncomeAndExpense == 0
+            ? 0
+            : (totalIncome / totalIncomeAndExpense) * 100,
         maxExpenseDay,
         topExpenseCategory,
         topExpenseAccount,

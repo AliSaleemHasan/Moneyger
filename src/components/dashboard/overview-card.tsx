@@ -20,7 +20,9 @@ const OverviewCard: FC<IOverviewCardProps> = (props) => {
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{props.value}</div>
-        <p className="text-xs text-muted-foreground">{props.stats}</p>
+        <p className="text-xs text-muted-foreground">
+          {props.stats || "not Available"}
+        </p>
       </CardContent>
     </Card>
   );
