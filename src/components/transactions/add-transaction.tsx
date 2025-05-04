@@ -61,8 +61,8 @@ export default function AddTransaction() {
   if (
     categoriesLoading ||
     accountsLoading ||
-    !categoriesData.categories ||
-    !accountsData.accounts
+    !categoriesData?.categories ||
+    !accountsData?.accounts
   )
     return <Loader2 className="animate-spine text-primary" />;
 
