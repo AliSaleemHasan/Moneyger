@@ -58,13 +58,8 @@ export default function AddTransaction() {
       setOpen(false);
     }
   }, [state]);
-  if (
-    categoriesLoading ||
-    accountsLoading ||
-    !categoriesData?.categories ||
-    !accountsData?.accounts
-  )
-    return <Loader2 className="animate-spine text-primary" />;
+  if (categoriesLoading || accountsLoading)
+    return <Loader2 className="animate-spin text-primary" />;
 
   return (
     <Dialog open={open} onOpenChange={(open) => setOpen(open)}>
