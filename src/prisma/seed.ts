@@ -2,7 +2,7 @@
 
 import prisma from "@/prisma/prisma";
 import { Category, Account } from "generated";
-const defaultCategories: Partial<Category>[] = [
+const defaultCategories: { description: string; name: string }[] = [
   { description: "Car, Plane, Train ..etc", name: "Transportation" },
   { description: "Furniture, Electronics ...etc ", name: "HouseHold" },
   { description: "Phone, landline, WIFI", name: "Communication" },
@@ -12,7 +12,7 @@ const defaultCategories: Partial<Category>[] = [
   { description: "Clothing, Fashion, Shoews, Laundry", name: "Apparel" },
 ];
 
-const defaultAccounts: Partial<Account>[] = [
+const defaultAccounts: { name: string }[] = [
   { name: "Revolute" },
   { name: "Cash" },
   { name: "OTP" },

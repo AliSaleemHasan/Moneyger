@@ -22,7 +22,7 @@ export function CalendarDateRangePicker({
 
   React.useEffect(() => {
     router.push("?from=" + date?.from + "&to=" + date?.to);
-  }, [date]);
+  }, [date, router]);
   return (
     <div className={cn("grid gap-2", className)}>
       <Popover>
