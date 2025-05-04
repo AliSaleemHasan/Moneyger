@@ -33,13 +33,13 @@ const TransactionsList = () => {
       {data.records?.edges?.map((item: any, index: number) => (
         <Transaction
           key={index}
-          category={item.node.category.name}
+          category={item?.node?.category?.name}
           title={""}
-          description={item.node.note}
-          account={item.node.account.name}
-          type={item.node.type}
-          amount={+item.node.amount + "fr"}
-          date={item.node.createdAt}
+          description={item?.node?.note}
+          account={item?.node?.account?.name}
+          type={item?.node?.type}
+          amount={+item?.node?.amount + "fr"}
+          date={item?.node?.createdAt}
         />
       ))}
     </div>
