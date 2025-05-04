@@ -4,6 +4,7 @@ import { useQuery } from "@apollo/client";
 import React, { useContext } from "react";
 import { UserContext } from "../authnetication/auth-provider";
 import Transaction from "./transaction";
+import Image from "next/image";
 
 const TransactionsList = () => {
   const user = useContext(UserContext);
@@ -16,6 +17,16 @@ const TransactionsList = () => {
   });
 
   if (loading) return <p>loading...</p>;
+  console.log(data);
+  if (!data || data.records?.edges.length == 0)
+    return (
+      <div className="w-full flex flex-col items-center justify-between">
+        <p className=" text-muted-foreground">
+          No transactions yet, record new ones by clicking the plus icon on the
+          bottom right corner..
+        </p>
+      </div>
+    );
 
   return (
     <div className="flex flex-col gap-3">
